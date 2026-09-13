@@ -38,7 +38,7 @@ jobs:
           VITE_POLL_INTERVAL_MS: ${{ secrets.VITE_POLL_INTERVAL_MS }}
           # Project page (username.github.io/repo-name/): set to /repo-name/
           # User/org page or custom domain: delete this line entirely.
-          VITE_BASE_PATH: /playing-fm/
+          VITE_BASE_PATH: /listening-fm/
 
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -1,4 +1,4 @@
-# playing.fm
+# listening.fm
 
 A personal "now playing" status page. Shows what you're listening to right
 now (or the last thing you played), backed by Last.fm, with a background
@@ -80,6 +80,12 @@ to `main`. To turn it on:
    → Actions → New repository secret — one for each of `VITE_LASTFM_API_KEY`,
    `VITE_LASTFM_USERNAME`, `VITE_DISPLAY_NAME`, `VITE_SPOTIFY_URL`,
    `VITE_AOTY_URL`, `VITE_POLL_INTERVAL_MS`.
+
+   Faster: with the [GitHub CLI](https://cli.github.com) installed and
+   authenticated (`gh auth login`), fill in a real `.env` (drop any line
+   you're leaving blank) and run `gh secret set --env-file .env` from the
+   repo folder — it creates all of them in one shot. Check with
+   `gh secret list`.
 3. **Set the base path** in `.github/workflows/deploy.yml`:
    - Repo is a *project* page (site will live at `username.github.io/repo-name/`) →
      keep `VITE_BASE_PATH: /repo-name/`, matching your actual repo name.
