@@ -51,7 +51,7 @@ export default function App() {
     <div className="relative flex min-h-screen w-full flex-col items-center">
       <Background artworkUrl={current?.artworkUrl} />
 
-      <main className="flex w-full flex-1 flex-col items-start justify-center gap-16 px-6 py-20 sm:px-10 lg:flex-row lg:items-center lg:gap-16 lg:px-20 lg:py-24 xl:px-28">
+      <main className="flex w-full flex-1 flex-col items-start justify-center gap-16 px-6 py-20 sm:px-8 lg:flex-row lg:items-start lg:justify-between lg:gap-12 lg:px-[50px] lg:py-24">
         {(showUnconfigured || showLoading || showError || showEmpty) && (
           <div className="flex w-full flex-1 items-center justify-center">
             {showUnconfigured && <StateFallback kind="unconfigured" />}
@@ -80,7 +80,7 @@ export default function App() {
             </div>
 
             {hasAotyContent && (
-              <aside className="flex w-full max-w-md flex-col gap-14 lg:pt-2">
+              <aside className="flex w-full max-w-md shrink-0 flex-col gap-14">
                 <RecentlyReviewed albums={recentlyReviewed} profileUrl={profile.links.aoty} />
                 <TopAlbumsOfYear
                   albums={topOfYear}
