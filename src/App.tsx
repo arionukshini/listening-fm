@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { LastFmProvider } from './providers/LastFmProvider';
 import { useNowPlaying } from './hooks/useNowPlaying';
+import { useAlbumArt } from './hooks/useAlbumArt';
+import { albumArtKey } from './utils/albumArt';
 import { profile, POLL_INTERVAL_MS } from './config/profile';
 import { relativeTime } from './utils/time';
 import aotyData from './data/aoty.json';
@@ -32,11 +34,24 @@ export default function App() {
 
   const hasAotyContent = aoty.recentlyReviewed.length > 0 || aoty.topOfYear.length > 0;
 
+  // Cover art: use whatever's hand-set in aoty.json, else try to resolve it
+  // live from Last.fm (a public API — not AOTY scraping; see README).
+  const recentArt = useAlbumArt(aoty.recentlyReviewed);
+  const topArt = useAlbumArt(aoty.topOfYear);
+  const recentlyReviewed = useMemo(
+    () => aoty.recentlyReviewed.map((a) => ({ ...a, art: a.art || recentArt[albumArtKey(a)] })),
+    [recentArt],
+  );
+  const topOfYear = useMemo(
+    () => aoty.topOfYear.map((a) => ({ ...a, art: a.art || topArt[albumArtKey(a)] })),
+    [topArt],
+  );
+
   return (
-    <div className="relative flex min-h-screen w-full flex-col items-center px-6">
+    <div className="relative flex min-h-screen w-full flex-col items-center">
       <Background artworkUrl={current?.artworkUrl} />
 
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-start justify-center gap-16 py-20 lg:flex-row lg:items-center lg:gap-24 lg:py-24">
+      <main className="flex w-full flex-1 flex-col items-start justify-center gap-16 px-6 py-20 sm:px-10 lg:flex-row lg:items-center lg:gap-16 lg:px-20 lg:py-24 xl:px-28">
         {(showUnconfigured || showLoading || showError || showEmpty) && (
           <div className="flex w-full flex-1 items-center justify-center">
             {showUnconfigured && <StateFallback kind="unconfigured" />}
@@ -65,10 +80,10 @@ export default function App() {
             </div>
 
             {hasAotyContent && (
-              <aside className="flex w-full max-w-sm flex-col gap-12 lg:pt-2">
-                <RecentlyReviewed albums={aoty.recentlyReviewed} profileUrl={profile.links.aoty} />
+              <aside className="flex w-full max-w-md flex-col gap-14 lg:pt-2">
+                <RecentlyReviewed albums={recentlyReviewed} profileUrl={profile.links.aoty} />
                 <TopAlbumsOfYear
-                  albums={aoty.topOfYear}
+                  albums={topOfYear}
                   year={aoty.year}
                   profileUrl={profile.links.aoty}
                 />

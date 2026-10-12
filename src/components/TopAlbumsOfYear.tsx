@@ -13,7 +13,7 @@ export function TopAlbumsOfYear({ albums, year, profileUrl }: TopAlbumsOfYearPro
   return (
     <section className="w-full">
       <h2 className="font-mono text-xs tracking-[0.2em] text-mist/70">TOP ALBUMS OF {year}</h2>
-      <ul className="mt-3 divide-y divide-thread">
+      <ul className="mt-4 divide-y divide-thread">
         {albums.map((album, index) => (
           <AotyAlbumRow
             key={`${album.title}-${album.artist}`}

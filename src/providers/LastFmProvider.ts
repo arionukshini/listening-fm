@@ -1,20 +1,8 @@
 import type { MusicProvider, NowPlayingState, Track } from '../types/music';
 import type { LastFmRecentTracksResponse, LastFmTrack } from './lastfm.types';
+import { pickBestImage } from '../utils/lastfmImages';
 
 const API_ROOT = 'https://ws.audioscrobbler.com/2.0/';
-
-function bestArtwork(track: LastFmTrack): string | undefined {
-  const images = track.image ?? [];
-  // Last.fm lists images small -> extralarge; walk backwards for the biggest usable one.
-  for (let i = images.length - 1; i >= 0; i -= 1) {
-    const url = images[i]['#text'];
-    // Last.fm returns a known grey placeholder path for missing art; treat it as absent.
-    if (url && !url.includes('2a96cbd8b46e442fc41c2b86b821562f')) {
-      return url;
-    }
-  }
-  return undefined;
-}
 
 function normalize(track: LastFmTrack, index: number): Track {
   const isNowPlaying = track['@attr']?.nowplaying === 'true';
@@ -23,7 +11,7 @@ function normalize(track: LastFmTrack, index: number): Track {
     name: track.name,
     artist: track.artist['#text'],
     album: track.album?.['#text'] || undefined,
-    artworkUrl: bestArtwork(track),
+    artworkUrl: pickBestImage(track.image),
     playedAt: track.date?.uts ? Number(track.date.uts) * 1000 : undefined,
     isNowPlaying,
     url: track.url,

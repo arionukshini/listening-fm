@@ -88,13 +88,24 @@ The "Recently Reviewed" and "Top Albums of Year" panels read from
 ```
 
 `art` (cover image URL) and `url` (deep link to that specific review) are
-optional on each entry — leave them out and the row falls back to a plain
-placeholder and links to your overall AOTY profile instead.
+optional on each entry.
 
-This is manual on purpose: AOTY has no public API, and its `robots.txt`
-explicitly disallows AI/data-collection crawlers site-wide, so this project
-doesn't scrape it. Either panel disappears automatically if you leave its
-list empty.
+- **`url`** — leave it out and the row links to your overall AOTY profile
+  instead of that specific review.
+- **`art`** — leave it out and the page looks it up automatically at load
+  time via Last.fm's `album.getinfo` (`src/utils/albumArt.ts`), using the
+  same API key as the rest of the site. If Last.fm doesn't recognize the
+  exact title, it retries once with a trailing edition suffix like
+  "(2024 reissue)" or "(Digital Deluxe)" stripped off. If it still can't
+  find anything, the row falls back to a plain placeholder — just set `art`
+  by hand on that entry to override it.
+
+Entry data (title/artist/score) stays manual on purpose: AOTY has no public
+API, and its `robots.txt` explicitly disallows AI/data-collection crawlers
+site-wide, so this project doesn't scrape it — only cover art is automated,
+via Last.fm instead. Either panel disappears automatically if you leave its
+list empty. Pushing a `aoty.json` change to `main` redeploys the site
+automatically, so updates go live as soon as you commit them.
 
 ## Deploying to GitHub Pages
 

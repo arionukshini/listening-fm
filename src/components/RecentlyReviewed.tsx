@@ -12,7 +12,7 @@ export function RecentlyReviewed({ albums, profileUrl }: RecentlyReviewedProps) 
   return (
     <section className="w-full">
       <h2 className="font-mono text-xs tracking-[0.2em] text-mist/70">RECENTLY REVIEWED</h2>
-      <ul className="mt-3 divide-y divide-thread">
+      <ul className="mt-4 divide-y divide-thread">
         {albums.map((album) => (
           <AotyAlbumRow key={`${album.title}-${album.artist}`} entry={album} fallbackUrl={profileUrl} />
         ))}
