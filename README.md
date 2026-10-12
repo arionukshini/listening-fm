@@ -70,6 +70,32 @@ fetch keyed by an `/@username` route param without changing its consumers:
   intentionally doesn't fake one. That's the kind of thing a future
   Spotify-backed provider could add.
 
+## Album of the Year data
+
+The "Recently Reviewed" and "Top Albums of Year" panels read from
+`src/data/aoty.json`, which you edit by hand:
+
+```json
+{
+  "year": 2026,
+  "recentlyReviewed": [
+    { "title": "...", "artist": "...", "score": 85 }
+  ],
+  "topOfYear": [
+    { "title": "...", "artist": "...", "score": 100 }
+  ]
+}
+```
+
+`art` (cover image URL) and `url` (deep link to that specific review) are
+optional on each entry — leave them out and the row falls back to a plain
+placeholder and links to your overall AOTY profile instead.
+
+This is manual on purpose: AOTY has no public API, and its `robots.txt`
+explicitly disallows AI/data-collection crawlers site-wide, so this project
+doesn't scrape it. Either panel disappears automatically if you leave its
+list empty.
+
 ## Deploying to GitHub Pages
 
 A workflow at `.github/workflows/deploy.yml` builds and deploys on every push

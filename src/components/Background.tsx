@@ -18,7 +18,7 @@ export function Background({ artworkUrl }: BackgroundProps) {
       if (cancelled) return;
       if (rgb) {
         const [r, g, b] = rgb;
-        setGlow(`rgba(${r}, ${g}, ${b}, 0.22)`);
+        setGlow(`rgba(${r}, ${g}, ${b}, 0.42)`);
       }
     });
     return () => {
@@ -31,7 +31,7 @@ export function Background({ artworkUrl }: BackgroundProps) {
       {artworkUrl && (
         <div
           key={artworkUrl}
-          className="absolute inset-0 animate-fade-in bg-cover bg-center opacity-40 blur-3xl scale-125 transition-opacity duration-1000"
+          className="absolute inset-0 animate-fade-in bg-cover bg-center opacity-70 blur-2xl saturate-150 scale-110 transition-opacity duration-1000"
           style={{ backgroundImage: `url(${artworkUrl})` }}
         />
       )}
@@ -43,7 +43,7 @@ export function Background({ artworkUrl }: BackgroundProps) {
         }}
       />
       {/* dark overlay so text always stays readable */}
-      <div className="absolute inset-0 bg-void/75" />
+      <div className="absolute inset-0 bg-void/50" />
     </div>
   );
 }
