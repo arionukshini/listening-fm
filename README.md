@@ -73,7 +73,26 @@ fetch keyed by an `/@username` route param without changing its consumers:
 ## Album of the Year data
 
 The "Recently Reviewed" and "Top Albums of Year" panels read from
-`src/data/aoty.json`, which you edit by hand:
+`src/data/aoty.json`. There's no public AOTY API, and its `robots.txt`
+explicitly disallows AI/data-collection crawlers site-wide, so nothing here
+ever scrapes it — this file only ever changes because you tell it to,
+one of two ways:
+
+**Fastest: the "Update Albums" GitHub Action.** Repo → **Actions** tab →
+**Update Albums** → **Run workflow**. Fill in list (recent / top5), title,
+artist, score — it updates `aoty.json`, commits, and pushes, which
+automatically triggers the existing deploy workflow. No local git, no
+editing JSON by hand, works from a phone browser. Re-submitting the same
+title/artist updates that entry instead of duplicating it; `topOfYear`
+keeps itself sorted and capped at the top 5 by score, `recentlyReviewed`
+keeps the 5 most recent.
+
+This is a one-click *push*, not a background *poll* — nothing watches AOTY
+or runs on a schedule, you still tell it about each album yourself. That
+part can't be automated away (see above), only made fast.
+
+**Or: edit the file directly** (handy for bulk changes, or reordering
+things by hand):
 
 ```json
 {
@@ -100,12 +119,7 @@ optional on each entry.
   find anything, the row falls back to a plain placeholder — just set `art`
   by hand on that entry to override it.
 
-Entry data (title/artist/score) stays manual on purpose: AOTY has no public
-API, and its `robots.txt` explicitly disallows AI/data-collection crawlers
-site-wide, so this project doesn't scrape it — only cover art is automated,
-via Last.fm instead. Either panel disappears automatically if you leave its
-list empty. Pushing a `aoty.json` change to `main` redeploys the site
-automatically, so updates go live as soon as you commit them.
+Either panel disappears automatically if you leave its list empty.
 
 ## Deploying to GitHub Pages
 
@@ -132,6 +146,10 @@ to `main`. To turn it on:
    **GitHub Actions**.
 5. Push to `main` (or run the workflow manually from the Actions tab) and the
    site deploys automatically.
+
+If `main` has branch protection rules requiring pull requests, the "Update
+Albums" workflow above (which pushes straight to `main`) will fail — it
+needs direct push access, same as you'd use locally.
 
 **Heads up:** Vite inlines `VITE_*` env vars into the built JS at compile
 time. That means once deployed, your Last.fm API key is visible to anyone
