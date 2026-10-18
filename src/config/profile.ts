@@ -30,3 +30,6 @@ export const POLL_INTERVAL_MS = Number(import.meta.env.VITE_POLL_INTERVAL_MS) ||
 
 /** How many recent tracks to show before "Show more" is pressed. */
 export const RECENT_PREVIEW_COUNT = 3;
+
+/** Maximum number of entries shown in the Recently Reviewed panel. */
+export const RECENT_REVIEWED_CAP = 3;

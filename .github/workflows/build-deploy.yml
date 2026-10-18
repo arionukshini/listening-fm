@@ -11,6 +11,12 @@ name: Build and Deploy (reusable)
 
 on:
   workflow_call:
+    inputs:
+      ref:
+        description: 'Commit or ref to build and deploy'
+        required: false
+        type: string
+        default: main
 
 permissions:
   contents: read
@@ -26,6 +32,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
 
       - uses: actions/setup-node@v4
         with:

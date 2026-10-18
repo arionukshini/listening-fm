@@ -5,7 +5,7 @@ on:
     inputs:
       list:
         description: 'Which panel?'
-        required: true
+        required: false
         type: choice
         options:
           - recent
@@ -13,18 +13,18 @@ on:
         default: recent
       title:
         description: 'Album title'
-        required: true
+        required: false
         type: string
       artist:
         description: 'Artist'
-        required: true
+        required: false
         type: string
       score:
         description: 'Score, 0-100'
-        required: true
+        required: false
         type: string
       url:
-        description: '(optional) link to the review — leave blank to link your AOTY profile instead'
+        description: '(optional) direct AOTY album/review link — blank uses your AOTY profile'
         required: false
         type: string
       art:
@@ -33,6 +33,10 @@ on:
         type: string
       year:
         description: '(optional) only needed to change the "Top Albums of ____" year label'
+        required: false
+        type: string
+      albums:
+        description: 'Optional bulk mode: one per line as list | title | artist | score | url | art'
         required: false
         type: string
 
@@ -44,6 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       changed: ${{ steps.commit.outputs.changed }}
+      commit_sha: ${{ steps.commit.outputs.commit_sha }}
     steps:
       - uses: actions/checkout@v4
 
@@ -61,6 +66,7 @@ jobs:
           URL: ${{ inputs.url }}
           ART: ${{ inputs.art }}
           YEAR: ${{ inputs.year }}
+          ALBUMS: ${{ inputs.albums }}
 
       - name: Commit and push
         id: commit
@@ -73,9 +79,10 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          git commit -m "data: update ${{ inputs.list }} — ${{ inputs.title }} by ${{ inputs.artist }}"
+          git commit -m "data: update AOTY albums"
           git push origin HEAD:main
           echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
   # The push above won't trigger deploy.yml on its own — GitHub doesn't let
   # a push made with the default GITHUB_TOKEN trigger other workflows, to
@@ -89,4 +96,6 @@ jobs:
       pages: write
       id-token: write
     uses: ./.github/workflows/build-deploy.yml
+    with:
+      ref: ${{ needs.update.outputs.commit_sha }}
     secrets: inherit

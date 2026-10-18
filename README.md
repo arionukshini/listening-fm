@@ -80,13 +80,23 @@ one of two ways:
 
 **Fastest: the "Update Albums" GitHub Action.** Repo → **Actions** tab →
 **Update Albums** → **Run workflow**. Fill in list (recent / top5), title,
-artist, score — it updates `aoty.json`, commits and pushes it, then
-deploys the site itself (see below for why it deploys directly rather
-than relying on the push to trigger it). No local git, no editing JSON by
-hand, works from a phone browser. Re-submitting the same title/artist
-updates that entry instead of duplicating it; `topOfYear` keeps itself
-sorted and capped at the top 5 by score, `recentlyReviewed` keeps the 5
-most recent.
+artist, score — it updates `aoty.json`, commits it, and deploys the new
+commit in the same workflow. There is no second deploy action to run. No
+local git, no editing JSON by hand, works from a phone browser. Re-submitting
+the same title/artist updates that entry instead of duplicating it;
+`topOfYear` keeps itself sorted and capped at the top 5 by score,
+`recentlyReviewed` keeps the 3 most recent.
+
+For several albums at once, leave the single-album fields blank and paste one
+line per album into the **albums** field using this format:
+
+```text
+recent | Album title | Artist | 85 | https://www.albumoftheyear.org/album/... | optional-art-url
+top5 | Another album | Artist | 92 | https://www.albumoftheyear.org/album/...
+```
+
+The first `recent` line is treated as the newest. All lines are committed and
+deployed together, so a batch only waits for one build.
 
 This is a one-click *push*, not a background *poll* — nothing watches AOTY
 or runs on a schedule, you still tell it about each album yourself. That
@@ -107,11 +117,12 @@ things by hand):
 }
 ```
 
-`art` (cover image URL) and `url` (deep link to that specific review) are
-optional on each entry.
+`art` (cover image URL) and `url` (direct AOTY album/review link) are optional
+on each entry.
 
-- **`url`** — leave it out and the row links to your overall AOTY profile
-  instead of that specific review.
+- **`url`** — add the album page or your specific review/rating page so the
+  row opens that entry directly. If omitted, it links to your overall AOTY
+  profile.
 - **`art`** — leave it out and the page looks it up automatically at load
   time via Last.fm's `album.getinfo` (`src/utils/albumArt.ts`), using the
   same API key as the rest of the site. If Last.fm doesn't recognize the
@@ -156,12 +167,9 @@ direct push access, same as you'd use locally.
 
 **Why `build-deploy.yml` is split out:** a push made by the Actions bot's
 own default token doesn't trigger other workflows' `on: push` — GitHub
-blocks that specifically to prevent infinite workflow loops. So
-`update-albums.yml`'s own push to `main` was silently *not* re-triggering
-`deploy.yml`: the update would succeed and show green, but the live site
-never rebuilt. Splitting the build/deploy logic into its own reusable
-workflow lets `update-albums.yml` call it directly instead of hoping the
-push event fires — now every album update deploys for real.
+blocks that specifically to prevent infinite workflow loops. The update
+workflow therefore calls the reusable build/deploy job itself and passes the
+exact commit it just pushed, so the first deploy contains the new album data.
 
 **Heads up:** Vite inlines `VITE_*` env vars into the built JS at compile
 time. That means once deployed, your Last.fm API key is visible to anyone

@@ -4,54 +4,52 @@
     {
       "title": "EVOL",
       "artist": "Future",
-      "score": 60
+      "score": 60,
+      "url": "https://www.albumoftheyear.org/album/49593-future-evol.php"
     },
     {
       "title": "U",
       "artist": "underscores",
-      "score": 95
+      "score": 95,
+      "url": "https://www.albumoftheyear.org/album/1701933-underscores-u.php"
     },
     {
       "title": "2093 (P3) (2024 reissue)",
       "artist": "Yeat",
-      "score": 75
-    },
-    {
-      "title": "LYFESTYLE (Digital Deluxe)",
-      "artist": "Yeat",
-      "score": 65
-    },
-    {
-      "title": "LYFESTYLE (Dune Edition)",
-      "artist": "Yeat",
-      "score": 65
+      "score": 75,
+      "url": "https://www.albumoftheyear.org/album/882195-yeat-2093-p3.php"
     }
   ],
   "topOfYear": [
     {
       "title": "Half Blood (BloodLuxe)",
       "artist": "slayr",
-      "score": 100
+      "score": 100,
+      "url": "https://www.albumoftheyear.org/album/1572710-slayr-half-blood-bloodluxe.php"
     },
     {
       "title": "U",
       "artist": "underscores",
-      "score": 95
+      "score": 95,
+      "url": "https://www.albumoftheyear.org/album/1701933-underscores-u.php"
     },
     {
       "title": "c",
       "artist": "Lucy Bedroque",
-      "score": 95
+      "score": 95,
+      "url": "https://www.albumoftheyear.org/album/1607077-lucy-bedroque-c.php"
     },
     {
       "title": "xperiment",
       "artist": "Ken Carson",
-      "score": 85
+      "score": 85,
+      "url": "https://www.albumoftheyear.org/album/1529670-ken-carson-xperiment.php"
     },
     {
       "title": "BLUNTS & BLADES",
       "artist": "Zukenee",
-      "score": 80
+      "score": 80,
+      "url": "https://www.albumoftheyear.org/album/1743085-zukenee-blunts-blades.php"
     }
   ]
 }

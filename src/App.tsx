@@ -3,7 +3,7 @@ import { LastFmProvider } from './providers/LastFmProvider';
 import { useNowPlaying } from './hooks/useNowPlaying';
 import { useAlbumArt } from './hooks/useAlbumArt';
 import { albumArtKey } from './utils/albumArt';
-import { profile, POLL_INTERVAL_MS } from './config/profile';
+import { profile, POLL_INTERVAL_MS, RECENT_REVIEWED_CAP } from './config/profile';
 import { relativeTime } from './utils/time';
 import aotyData from './data/aoty.json';
 import type { AotyData } from './types/aoty';
@@ -26,21 +26,25 @@ export default function App() {
     [],
   );
   const { status, current, recent, error } = useNowPlaying(provider, POLL_INTERVAL_MS);
+  const recentReviewedEntries = useMemo(
+    () => aoty.recentlyReviewed.slice(0, RECENT_REVIEWED_CAP),
+    [],
+  );
 
   const showUnconfigured = error === 'missing-config';
   const showLoading = status === 'loading' && !current;
   const showError = status === 'error' && !current && !showUnconfigured;
   const showEmpty = status === 'ready' && !current;
 
-  const hasAotyContent = aoty.recentlyReviewed.length > 0 || aoty.topOfYear.length > 0;
+  const hasAotyContent = recentReviewedEntries.length > 0 || aoty.topOfYear.length > 0;
 
   // Cover art: use whatever's hand-set in aoty.json, else try to resolve it
   // live from Last.fm (a public API — not AOTY scraping; see README).
-  const recentArt = useAlbumArt(aoty.recentlyReviewed);
+  const recentArt = useAlbumArt(recentReviewedEntries);
   const topArt = useAlbumArt(aoty.topOfYear);
   const recentlyReviewed = useMemo(
-    () => aoty.recentlyReviewed.map((a) => ({ ...a, art: a.art || recentArt[albumArtKey(a)] })),
-    [recentArt],
+    () => recentReviewedEntries.map((a) => ({ ...a, art: a.art || recentArt[albumArtKey(a)] })),
+    [recentArt, recentReviewedEntries],
   );
   const topOfYear = useMemo(
     () => aoty.topOfYear.map((a) => ({ ...a, art: a.art || topArt[albumArtKey(a)] })),

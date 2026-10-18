@@ -12,7 +12,7 @@ export interface AotyAlbumEntry {
   score: number;
   /** Album cover URL. Omit it and the UI falls back to a plain placeholder. */
   art?: string;
-  /** Deep link to the review/rating. Omit it and the UI links to your AOTY profile instead. */
+  /** Direct AOTY album page or deep link to a review/rating. */
   url?: string;
 }
 
