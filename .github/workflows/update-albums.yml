@@ -42,6 +42,8 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
     steps:
       - uses: actions/checkout@v4
 
@@ -61,10 +63,30 @@ jobs:
           YEAR: ${{ inputs.year }}
 
       - name: Commit and push
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add src/data/aoty.json
-          git diff --cached --quiet && echo "No changes" && exit 0
+          if git diff --cached --quiet; then
+            echo "No changes"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           git commit -m "data: update ${{ inputs.list }} — ${{ inputs.title }} by ${{ inputs.artist }}"
           git push origin HEAD:main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+  # The push above won't trigger deploy.yml on its own — GitHub doesn't let
+  # a push made with the default GITHUB_TOKEN trigger other workflows, to
+  # prevent infinite loops. So this calls the same build/deploy directly
+  # instead of hoping the push event fires it.
+  deploy:
+    needs: update
+    if: needs.update.outputs.changed == 'true'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/build-deploy.yml
+    secrets: inherit

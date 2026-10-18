@@ -80,12 +80,13 @@ one of two ways:
 
 **Fastest: the "Update Albums" GitHub Action.** Repo → **Actions** tab →
 **Update Albums** → **Run workflow**. Fill in list (recent / top5), title,
-artist, score — it updates `aoty.json`, commits, and pushes, which
-automatically triggers the existing deploy workflow. No local git, no
-editing JSON by hand, works from a phone browser. Re-submitting the same
-title/artist updates that entry instead of duplicating it; `topOfYear`
-keeps itself sorted and capped at the top 5 by score, `recentlyReviewed`
-keeps the 5 most recent.
+artist, score — it updates `aoty.json`, commits and pushes it, then
+deploys the site itself (see below for why it deploys directly rather
+than relying on the push to trigger it). No local git, no editing JSON by
+hand, works from a phone browser. Re-submitting the same title/artist
+updates that entry instead of duplicating it; `topOfYear` keeps itself
+sorted and capped at the top 5 by score, `recentlyReviewed` keeps the 5
+most recent.
 
 This is a one-click *push*, not a background *poll* — nothing watches AOTY
 or runs on a schedule, you still tell it about each album yourself. That
@@ -123,8 +124,10 @@ Either panel disappears automatically if you leave its list empty.
 
 ## Deploying to GitHub Pages
 
-A workflow at `.github/workflows/deploy.yml` builds and deploys on every push
-to `main`. To turn it on:
+The actual build-and-deploy steps live in `.github/workflows/build-deploy.yml`,
+a reusable workflow. Two things call it: `deploy.yml` (on every push to
+`main`), and `update-albums.yml` (right after it commits an album update) —
+both end up running the same build. To turn it on:
 
 1. **Push this repo to GitHub.**
 2. **Add your env values as repo secrets** — Settings → Secrets and variables
@@ -137,19 +140,28 @@ to `main`. To turn it on:
    you're leaving blank) and run `gh secret set --env-file .env` from the
    repo folder — it creates all of them in one shot. Check with
    `gh secret list`.
-3. **Set the base path** in `.github/workflows/deploy.yml`:
+3. **Set the base path** in `.github/workflows/build-deploy.yml`:
    - Repo is a *project* page (site will live at `username.github.io/repo-name/`) →
      keep `VITE_BASE_PATH: /repo-name/`, matching your actual repo name.
    - Repo is a *user/org* page (named exactly `username.github.io`) or you're
      using a custom domain → delete that `VITE_BASE_PATH` line entirely.
 4. **Enable Pages** — Settings → Pages → Build and deployment → Source:
    **GitHub Actions**.
-5. Push to `main` (or run the workflow manually from the Actions tab) and the
+5. Push to `main` (or run `deploy.yml` manually from the Actions tab) and the
    site deploys automatically.
 
 If `main` has branch protection rules requiring pull requests, the "Update
-Albums" workflow above (which pushes straight to `main`) will fail — it
-needs direct push access, same as you'd use locally.
+Albums" workflow (which pushes straight to `main`) will fail — it needs
+direct push access, same as you'd use locally.
+
+**Why `build-deploy.yml` is split out:** a push made by the Actions bot's
+own default token doesn't trigger other workflows' `on: push` — GitHub
+blocks that specifically to prevent infinite workflow loops. So
+`update-albums.yml`'s own push to `main` was silently *not* re-triggering
+`deploy.yml`: the update would succeed and show green, but the live site
+never rebuilt. Splitting the build/deploy logic into its own reusable
+workflow lets `update-albums.yml` call it directly instead of hoping the
+push event fires — now every album update deploys for real.
 
 **Heads up:** Vite inlines `VITE_*` env vars into the built JS at compile
 time. That means once deployed, your Last.fm API key is visible to anyone

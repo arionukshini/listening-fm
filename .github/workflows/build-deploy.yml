@@ -1,0 +1,62 @@
+name: Build and Deploy (reusable)
+
+# Not triggered directly — called by deploy.yml (on every push to main) and
+# by update-albums.yml (right after it commits an album update). Pulled out
+# into its own file so both call sites share one build, instead of update
+# albums depending on its own push re-triggering deploy.yml — which it
+# can't: GitHub doesn't let a push made with the default GITHUB_TOKEN
+# trigger other workflows' `on: push`, specifically to prevent infinite
+# workflow loops. That silent non-trigger was why "Update Albums" could
+# show green while the live site stayed stale.
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_LASTFM_API_KEY: ${{ secrets.VITE_LASTFM_API_KEY }}
+          VITE_LASTFM_USERNAME: ${{ secrets.VITE_LASTFM_USERNAME }}
+          VITE_DISPLAY_NAME: ${{ secrets.VITE_DISPLAY_NAME }}
+          VITE_SPOTIFY_URL: ${{ secrets.VITE_SPOTIFY_URL }}
+          VITE_AOTY_URL: ${{ secrets.VITE_AOTY_URL }}
+          VITE_POLL_INTERVAL_MS: ${{ secrets.VITE_POLL_INTERVAL_MS }}
+          # Project page (username.github.io/repo-name/): set to /repo-name/
+          # User/org page or custom domain: delete this line entirely.
+          VITE_BASE_PATH: /listening-fm/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
